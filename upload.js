@@ -35,7 +35,7 @@ myApp.service('fileUpload', ['$http', function($http) {
       })
       .success(function() {})
       .error(function() {
-        console.log(' nada!');
+        console.log('Sorry, I can\'t do this Dave');
       });
   };
 }]);
@@ -43,9 +43,15 @@ myApp.service('fileUpload', ['$http', function($http) {
 myApp.controller('myCtrl', ['$scope', 'fileUpload', '$timeout', function($scope, fileUpload, $timeout) {
 $scope.sortType='Id';
 $scope.content = false;
+
+
+$scope.resetFileUpload = function(){
+  $scope.content=[];
+};
+
   $scope.$watch('users_in_sections', function(newFileObj) {
     if (newFileObj) {
-
+      $scope.content = false;
       var reader = new FileReader();
       reader.readAsText(newFileObj);
 
@@ -62,6 +68,8 @@ $scope.content = false;
     }
   });
 
+
+
   $scope.uploadForm = function() {
     var file = $scope.users_in_sections;
     var uploadUrl = "/formUpload";
@@ -75,10 +83,10 @@ $scope.content = false;
     fileUpload.uploadFileAndFieldsToUrl(file, fields, uploadUrl);
   };
 
-
   parseCSV = function(CSVdata, headers, colCount) {
       var lines=CSVdata.split("\n");
       var result = [];
+      $scope.errors = [];
       for(var i=0;i<lines.length;i++){
         var lineArray =lines[i].split(',');
         var obj ={'rowId':i};
@@ -94,7 +102,10 @@ $scope.content = false;
 
         result.push(obj);
       }
-      $scope.errors = _.where(result, {invalid: true});
+      if (_.where(result, {invalid: true}).length) {
+        $scope.errors = _.where(result, {invalid: true});
+      }
+
       return result;
   };
 
