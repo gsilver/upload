@@ -1,4 +1,4 @@
-var myApp = angular.module('myApp', []);
+var myApp = angular.module('myApp', ['ngAnimate']);
 
 myApp.directive('fileModel', ['$parse', function($parse) {
   return {
@@ -41,7 +41,8 @@ myApp.service('fileUpload', ['$http', function($http) {
 }]);
 
 myApp.controller('myCtrl', ['$scope', 'fileUpload', '$timeout', function($scope, fileUpload, $timeout) {
-
+$scope.sortType='Id';
+$scope.content = false;
   $scope.$watch('users_in_sections', function(newFileObj) {
     if (newFileObj) {
 
@@ -51,8 +52,8 @@ myApp.controller('myCtrl', ['$scope', 'fileUpload', '$timeout', function($scope,
 
       reader.onload = function(e) {
         var CSVPreview = function() {
-          $scope.content = parseCSV(reader.result);
-          $scope.headers = ['User Id', 'Role', 'Section', 'Status']
+          $scope.headers = ['Id', 'Role', 'Section', 'Status'];
+          $scope.content = parseCSV(reader.result, $scope.headers, 4);
         };
         $timeout(CSVPreview, 100);
       };
@@ -75,15 +76,25 @@ myApp.controller('myCtrl', ['$scope', 'fileUpload', '$timeout', function($scope,
   };
 
 
-  parseCSV = function(CSVdata) {
+  parseCSV = function(CSVdata, headers, colCount) {
       var lines=CSVdata.split("\n");
       var result = [];
+      for(var i=0;i<lines.length;i++){
+        var lineArray =lines[i].split(',');
+        var obj ={'rowId':i};
+        for (var x=0;x<lineArray.length;x++){
+          if(lineArray[x] ==='' || lineArray[x].split(' ').length !==1){
+            obj.invalid = true;
+          }
+          obj[headers[x]] = lineArray[x];
+        }
+        if(lineArray.length !== colCount){
+          obj.invalid = true;
+        }
 
-      for(var i=1;i<lines.length;i++){
-    	  var obj = {};
-    	  var currentline=lines[i].split(",");
-    	  result.push(currentline);
+        result.push(obj);
       }
+      $scope.errors = _.where(result, {invalid: true});
       return result;
   };
 
