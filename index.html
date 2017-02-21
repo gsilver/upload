@@ -16,9 +16,9 @@
   <div ng-controller="myCtrl">
     <br><br>
     <div class="container-fluid">
-      <form ng-class="{ 'btn-group': content}">
+      <form ng-class="{ 'btn-group': content.length}">
         <input class="btn btn-primary" type="file" file-model="users_in_sections"/>
-        <button style="padding:7.5px 12px" ng-show="content" class="btn btn-primary"  type="reset" ng-click="resetFileUpload()" name="reset-file-input">Reset</button>
+        <button style="padding:7.5px 12px" ng-show="content" class="btn btn-default"  type="reset" ng-click="resetFileUpload()" name="reset-file-input">Reset</button>
       </form>
       <!-- <p>
         <label>File Name:</label>
