@@ -52,6 +52,7 @@ $scope.resetFileUpload = function(){
   $scope.$watch('users_in_sections', function(newFileObj) {
     if (newFileObj) {
       $scope.content = false;
+      $scope.loading = true;
       var reader = new FileReader();
       reader.readAsText(newFileObj);
 
@@ -105,7 +106,7 @@ $scope.resetFileUpload = function(){
       if (_.where(result, {invalid: true}).length) {
         $scope.errors = _.where(result, {invalid: true});
       }
-
+      $scope.loading = false;
       return result;
   };
 
