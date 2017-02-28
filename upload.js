@@ -100,7 +100,6 @@ $scope.resetFileUpload = function(){
         if(lineArray.length !== colCount){
           obj.invalid = true;
         }
-
         result.push(obj);
       }
       if (_.where(result, {invalid: true}).length) {

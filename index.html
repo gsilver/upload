@@ -13,14 +13,21 @@
 </head>
 
 <body>
-  <div ng-controller="myCtrl">
+  <div ng-controller="myCtrl" class="container-fluid">
+
     <br><br>
-    <div class="container-fluid">
-      <form ng-class="{ 'btn-group': content.length}" class="form-inline">
-        <input class="btn btn-primary form-control" type="file" file-model="users_in_sections"/>
-        <button ng-show="loading" class="btn btn-link"  type="reset"><span class="alert alert-danger">Loading...</span></button>
-        <button ng-show="content" class="btn btn-default"  type="reset" ng-click="resetFileUpload()" name="reset-file-input">Reset</button>
-      </form>
+    <form class="form-inline">
+      <div class="form-group">
+        <div class="input-group">
+          <input type="file"  type="file" file-model="users_in_sections">
+        </div>
+      </div>
+      <span ng-show="loading" class="alert alert-info">Loading...</span>
+      <button ng-show="content"class="btn btn-default"  type="reset" ng-click="resetFileUpload()" name="reset-file-input">Reset</button>
+    </form>
+
+
+
       <!-- <p>
         <label>File Name:</label>
         <input type="text" ng-model="filename" id="fileInput"></input>
