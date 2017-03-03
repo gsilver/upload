@@ -32,66 +32,57 @@ myApp.service('fileUpload', ['$http', function($http) {
       })
       .success(function() {})
       .error(function() {
-        console.log('Sorry, I can\'t do this Dave');
+        alert('Sorry, I can\'t do this Dave');
       });
   };
 }]);
 
-myApp.controller('myCtrl', ['$scope', '$rootScope','fileUpload', '$timeout', function($scope, $rootScope, fileUpload, $timeout) {
+myApp.controller('myCtrl', ['$scope', '$rootScope','fileUpload', '$timeout', '$log', function($scope, $rootScope, fileUpload, $timeout, $log) {
   $scope.fields = [{
     'name': 'user_id',
     'validation': {
-      'spaces': 'nospaces',
+      'spaces': false,
       'chars': 'num',
-      'max': 10,
-      'min': 10
-    }
-  }, {
-    'name': 'role',
-    'validation': {
-      'spaces': 'nospaces',
-      'chars': 'alpha',
-      'choices': ['choice1', 'choice2'],
-      'max': 10,
-      'min': 10
+      'max': 8,
+      'min': 8
     }
   }, {
     'name': 'section_id',
     'validation': {
-      'spaces': 'nospaces',
+      'spaces': false,
       'chars': 'num',
-      'max': 10,
-      'min': 10
+      'max': 30,
+      'min': 30
     }
   }, {
     'name': 'user_status',
     'validation': {
-      'spaces': 'nospaces',
+      'spaces': false,
       'chars': 'alpha',
-      'choices': ['choice1', 'choice2'],
-      'max': 10,
-      'min': 10
+      'choices': ['active','passive'],
+      'max': 20000,
+      'min': 1
     }
   }, {
     'name': 'section_name',
     'validation': {
-      'spaces': 'spaces',
+      'spaces': true,
       'chars': 'alpha',
-      'max': 10,
+      'max': 30,
       'min': 10
     }
   }, {
     'name': 'group_name',
     'validation': {
-      'spaces': 'spaces',
+      'spaces': true,
       'chars': 'alpha',
-      'max': 10,
-      'min': 10
+      'max': 30,
+      'min': 5
     }
   }, {
     'name': 'section_id',
     'validation': {
-      'spaces': 'nospaces',
+      'spaces': false,
       'chars': 'num',
       'max': 10,
       'min': 10
@@ -99,33 +90,33 @@ myApp.controller('myCtrl', ['$scope', '$rootScope','fileUpload', '$timeout', fun
   }, {
     'name': 'group_id',
     'validation': {
-      'spaces': 'nospaces',
-      'chars': 'num',
-      'max': 10,
-      'min': 10
+      'spaces': false,
+      'chars': 'alpha',
+      'max': 30,
+      'min': 2
     }
   }, {
     'name': 'section_status',
     'validation': {
-      'spaces': 'nospaces',
+      'spaces': false,
       'chars': 'alpha',
       'choices': ['choice1', 'choice2'],
-      'max': 10,
-      'min': 10
+      'max': 2000,
+      'min': 1
     }
   }, {
     'name': 'group_status',
     'validation': {
-      'spaces': 'nospaces',
+      'spaces': false,
       'chars': 'alpha',
       'choices': ['accepted', 'deleted'],
-      'max': 10,
-      'min': 10
+      'max': 2000,
+      'min': 1
     }
   }, {
     'name': 'user_uniqname',
     'validation': {
-      'spaces': 'nospaces',
+      'spaces': false,
       'chars': 'alpha',
       'max': 10,
       'min': 10
@@ -133,23 +124,38 @@ myApp.controller('myCtrl', ['$scope', '$rootScope','fileUpload', '$timeout', fun
   }, {
     'name': 'user_role',
     'validation': {
-      'spaces': 'nospaces',
+      'spaces': false,
       'chars': 'alpha',
-      'choices': ['role1', 'role2'],
-      'max': 10,
-      'min': 10
+      'choices': ['student', 'instructor'],
+      'max': 2000,
+      'min': 1
     }
   }, ];
 
-  $scope.changeSelectedFunction = function(value){
-  $rootScope.selectedFunction = value;
-
+  $scope.$watch('selectedFunction', function() {
+    if($scope.selectedFunction){
+      var fields = $scope.selectedFunction.fields;
+      var new_fields=[];
+      var curValidation =[];
+      var obj={};
+      _.each(fields,function(field, index){
+        var val = _.findWhere($scope.fields, {'name': field}).validation;
+        new_fields.push({'name':field,'validation':val});
+        val.name = field;
+        curValidation.push(val);
+      });
+      $scope.selectedFunction.tabular_fields = new_fields;
+      $scope.curValidation= curValidation;
+    }
+  });
+  $scope.changeSelectedFunction = function(){
+    $rootScope.selectedFunction = value;
   };
   $scope.functions = [{
     name: 'Add multiple users to Canvas sections through CSV',
     id: 'users_in_sections',
     type: 'csv',
-    fields: ['user_id', 'role', 'section_id', 'user_status'],
+    fields: ['user_id', 'user_role', 'section_id', 'user_status'],
     fields_model : ['User ID', 'Role', 'Section Id', 'User Status']
 
   }, {
@@ -168,7 +174,7 @@ myApp.controller('myCtrl', ['$scope', '$rootScope','fileUpload', '$timeout', fun
     name: 'Add multiple users to Canvas groups through CSV',
     id: 'users_to_groups',
     type: 'csv',
-    fields: ['user_id', 'group_id', 'status'],
+    fields: ['user_id', 'group_id', 'group_status'],
     fields_model: ['User Id', 'Group Id', 'Status']
   }, {
     name: 'Add multiple users to Canvas sections through data grid',
@@ -210,6 +216,10 @@ myApp.controller('myCtrl', ['$scope', '$rootScope','fileUpload', '$timeout', fun
     }
   });
 
+$scope.changeSelectedFunction = function(){
+  $scope.content =[];
+};
+
 
   $scope.uploadForm = function() {
     var file = $scope.users_in_sections;
@@ -232,18 +242,45 @@ myApp.controller('myCtrl', ['$scope', '$rootScope','fileUpload', '$timeout', fun
       var lineArray = lines[i].split(',');
       var obj = {};
       obj.data=[];
-      _.each(headers, function(cel, index){
+      var number_pattern = /^\d+$/;
+      _.each(headers, function(header, index){
+        var validation = _.findWhere($scope.fields, {name: header}).validation;
         if(lineArray[index]){
-          if(lineArray[index].split(' ').length !== 1 || lineArray[index] ===''){
+          if(lineArray[index].split(' ').length !== 1 && !validation.spaces){
+            $log.warn(lineArray[index]  + ' has spaces');
             obj.invalid = true;
+          }
+          if(lineArray[index].length > validation.max) {
+            $log.warn(lineArray[index] + ' too many chars');
+            obj.invalid = true;
+          }
+          if(lineArray[index].length < validation.min) {
+            $log.warn(lineArray[index] + ' too few chars');
+            obj.invalid = true;
+          }
+          if(!number_pattern.test(lineArray[index]) && validation.chars ==='num') {
+            $log.warn(lineArray[index] + ' not a number');
+            obj.invalid = true;
+          }
+          if(validation.choices){
+            if(_.indexOf(validation.choices, lineArray[index]) ===-1){
+              $log.warn(lineArray[index] + ' is not one of the choices in ' + validation.choices);
+              obj.invalid = true;
+            }
           }
         }
         obj.data.push(lineArray[index]);
       });
-      if (lineArray.length !== colCount) {
+      if (lineArray.length !== colCount && lineArray !==['']) {
         obj.invalid = true;
       }
-      result.push(obj);
+
+      if(lineArray.length === 1 &&    lineArray[0]===''){
+
+      }
+      else {
+        result.push(obj);
+      }
     }
     if (_.where(result, {
         invalid: true
