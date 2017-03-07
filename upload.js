@@ -43,6 +43,19 @@ myApp.controller('myCtrl', ['$scope', '$rootScope', 'fileUpload', '$timeout', '$
     $scope.functions = data;
   });
 
+  $scope.availableSections =[
+    "s12345678",
+    "sabcdefgi",
+    "sxyzxyzxyzxyz"
+  ];
+
+  $scope.availableGroups =[
+    "g12345678",
+    "gabcdefgi",
+    "gxyzxyzxyzxyz"
+  ];
+
+
   $scope.changeSelectedFunction = function() {
     $rootScope.selectedFunction = value;
   };

@@ -92,9 +92,15 @@
       <table class="table table-striped  table-hover" style="width:auto">
         <tr ng-repeat="i in getNumber(gridRowNumber) track by $index">
           <td ng-repeat="field in selectedFunction.fields track by $index">
-            <input ng-if="!field.validation.choices" type="text" class="form-control" name="" value="" placeholder="{{field.name}}">
+            <input ng-if="!field.validation.choices && field.name !=='section_id' && field.name !=='group_id'" type="text" class="form-control" name="" value="" placeholder="{{field.name}}">
             <select ng-if="field.validation.choices" class="form-control" name="">
-              <<option value="" ng-repeat="choice in field.validation.choices">{{choice}}</option>
+              <option ng-if="field.validation.choices" value="" ng-repeat="choice in field.validation.choices">{{choice}}</option>
+            </select>
+            <select ng-if="field.name==='section_id'" class="form-control">
+              <option ng-if="!field.validation.choices" value="" ng-repeat="section in availableSections">{{section}}</option>
+            </select>
+            <select ng-if="field.name==='group_id'"  class="form-control">
+              <option ng-if="!field.validation.choices" value="" ng-repeat="group in availableGroups">{{group}}</option>
             </select>
           </td>
         </tr>
